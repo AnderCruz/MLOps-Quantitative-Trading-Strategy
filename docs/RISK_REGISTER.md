@@ -2,9 +2,8 @@
 
 **Project:** Quantitative Trading Strategy\
 **Document status:** Active\
-**Project phase:** Phase 5 --- Financial Time Series and Macroeconomic
-Analysis\
-**Last updated:** 9 November 2026\
+**Project phase:** Phase 8 --- Machine Learning Experiments (implementation complete; owner review pending)\
+**Last updated:** 14 November 2026\
 **Language:** British English
 
 ------------------------------------------------------------------------
@@ -243,6 +242,40 @@ is recovered.
                                                                                    value.
   -------------------------------------------------------------------------------------------------------
 
+### 3.3 Phase 6 implementation risks
+
+The following risks were identified or confirmed during Phase 6 execution.
+They remain open because their closure criteria require additional evidence
+or owner review.
+
+| Risk ID | Risk statement | Likelihood | Impact | Status | Mitigation / closure criteria |
+|---|---|---:|---:|---|---|
+| RISK-06-01 | Redundant candidate features may inflate complexity and encourage unstable selection. | High | High | Open | The executed Spearman screen found 51–54 pairs per asset above 0.95 absolute correlation. Treat the 48-column set as a candidate library; pre-specify a smaller set and perform selection only inside chronological training windows. |
+| RISK-06-02 | Macro observations may be used before actual release or without vintage control. | High | High | Open | No macro series was joined to historical decisions. Validate per-observation availability, acquisition provenance and vintage semantics before any historical predictive use. Preserve PIT_UNVALIDATED exclusions. |
+| RISK-06-03 | Overlapping target horizons and unapproved neutral thresholds may bias later evaluation or produce unstable classes. | High | High | Open | Keep targets separate; report horizon-specific class balance; decide thresholds before model evaluation; purge overlapping origins and document the validation-specific embargo. |
+| RISK-06-04 | Relative regime labels may change materially with window and quantile choices and may be mistaken for stable economic states. | Medium | High | Open | Sensitivity runs show materially different state shares. Report transition/sub-period behaviour, avoid permanence claims, and re-evaluate only with pre-specified chronological evidence. |
+| RISK-06-05 | Close-based targets exclude dividends, while adjusted-price and corporate-action semantics remain unvalidated. | Medium | High | Open | Label the current targets as price returns. Review Close versus Adjusted Close and corporate actions before interpreting them as investment returns; do not infer dividend units. |
+
+### 3.4 Phase 7 baseline forecasting risks
+
+| Risk ID | Risk statement | Likelihood | Impact | Status | Mitigation / closure criteria |
+|---|---|---:|---:|---|---|
+| RISK-07-01 | Small apparent return-forecast improvements may reflect model selection, overlapping labels or regime variation rather than stable predictive information. | High | High | Open | Retain naive benchmarks; keep the final holdout untouched; require consistent results across periods and pre-approved criteria before promoting a model. No feature group improved directional accuracy on the holdout. |
+| RISK-07-02 | Adjacent validation outcomes remain dependent because forward targets overlap, even after purging training labels at split boundaries. | High | Medium | Open | Report period-level metrics and avoid treating fold observations as independent; any inferential comparison must account for overlap and serial dependence. |
+| RISK-07-03 | GARCH(1,1) Gaussian QMLE may be sensitive to distributional assumptions, missing-row variance propagation and parameter instability. | Medium | High | Open | Keep GARCH as a benchmark only. Check convergence, residual distribution, parameter stability and performance across additional chronological windows before further use. |
+| RISK-07-04 | OLS feature groups may remain unstable under candidate redundancy and data snooping across assets, horizons and feature families. | High | High | Open | Keep feature groups small and pre-specified; fit scaling within training folds; avoid broad searches and require out-of-sample incremental value over naive references. |
+
+### 3.5 Phase 8 Machine Learning experiment risks
+
+| Risk ID | Risk statement | Likelihood | Impact | Status | Mitigation / closure criteria |
+|---|---|---:|---:|---|---|
+| RISK-08-01 | Existing observations, including the Phase 7 holdout, have already been exposed to project analysis; retrospective Phase 8 walk-forward results could be overstated as independent final-test evidence. | High | High | Open | Label all current results development-only. Freeze research choices and evaluate once on genuinely future observations before any promotion claim. |
+| RISK-08-02 | Multiple models, assets, targets, feature groups and horizons create selection and multiple-testing risk; overlapping labels and serial dependence remain. | High | High | Open | Pre-specify configurations, retain fold-level results, use horizon-based purging and gap-aware block resampling, and treat current intervals as descriptive because no multiplicity correction was applied. |
+| RISK-08-03 | Apparent volatility forecast improvements may be asset-, period- or regime-specific and may not persist out of sample. | High | High | Open | Retain statistical benchmarks and require confirmation on a future evaluation period across assets and horizons before promotion. |
+| RISK-08-04 | The zero-band direction target has very few neutral observations, which can make classification metrics unstable and predictions insensitive to the neutral class. | High | Medium | Open | Preserve the approved target, report class proportions, confusion matrices and balanced metrics; do not alter the neutral band without a separate decision. |
+| RISK-08-05 | The installed pandas version (3.1.1) differs from the pinned requirements version (3.1.0), which can reduce environment reproducibility. | Medium | Medium | Open | Reconcile the project environment and requirements through a separately reviewed dependency update; do not silently upgrade packages. |
+| RISK-08-06 | Phase 7 AR(1) parameter fitting drops missing returns before constructing lag pairs, potentially treating non-adjacent acquired rows as consecutive. | Medium | High | Open | Phase 8 uses an adjacent-acquired-row AR reference and documents the issue. Preserve Phase 7 results and implementation until owner review authorises any correction. |
+
 ## 4. Currency and price-unit control --- D140
 
 Decision D140 records the following provider metadata observed on 9
@@ -329,6 +362,12 @@ historical-data validation remain pending. Therefore, RISK-05-02 remains
                     out-of-sample evidence before                     incremental value
                     promoting relationships to                        over baselines
                     predictive features.                              
+
+  7                 Review the Phase 6              RISK-06-01 to     Completed 14 Nov
+                    implementation report and      RISK-06-05        2026; owner approved
+                    approve closure explicitly.                       Phase 6 closure.
+                                                                      Residual risks remain
+                                                                      open for later work.
   --------------------------------------------------------------------------------------
 
 ## 7. Change history
@@ -345,5 +384,33 @@ historical-data validation remain pending. Therefore, RISK-05-02 remains
                                       risks RISK-05-01 to RISK-05-10
                                       recorded. D140 currency/price-unit
                                       controls incorporated.
+
+  14 November 2026                    Phase 6 execution findings
+                                      recorded; five Phase 6 risks
+                                      added and left open pending
+                                      mitigation, owner review or
+                                      later-phase evidence.
+
+  14 November 2026                    Project owner approved Phase 6
+                                      closure. Residual Phase 6 risks
+                                      remain open and are carried into
+                                      subsequent authorised work.
+
+  14 November 2026                    Phase 7 baseline implementation
+                                      and research findings recorded;
+                                      four Phase 7 risks added and
+                                      left open pending further
+                                      evidence.
+
+  14 November 2026                    Project owner approved Phase 7
+                                      closure. Phase 7 risks and all
+                                      carried data risks remain open.
+
+  14 November 2026                    Phase 8 implementation findings
+                                      recorded; six Phase 8 risks added
+                                      and left open pending owner review,
+                                      prospective evaluation or dependency
+                                      reconciliation. Phase 8 closure is
+                                      not yet approved.
 
   -----------------------------------------------------------------------

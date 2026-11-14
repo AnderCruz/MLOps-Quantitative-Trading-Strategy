@@ -2,8 +2,8 @@
 ## AI Quantitative Trading & Strategy Optimisation System
 
 **Document status:** Active
-**Project phase:** Phase 5 — Financial Time Series and Macroeconomic Analysis (in progress)
-**Last updated:** 9 November 2026
+**Project phase:** Phase 8 — Machine Learning Experiments (implementation complete; owner review pending)
+**Last updated:** 14 November 2026
 
 ---
 
@@ -400,3 +400,120 @@ The `provider_quote_currency` value reported for the index must not be interpret
 - The FTSE 100 remains in index points.
 - This decision approves the unit convention; it does not constitute formal approval of the historical datasets for modelling or formal data-quality closure.
 - Raw acquisitions remain unchanged and immutable.
+
+## D141 — Phase 6 Implementation Methodology and Evidence
+
+**Status:** IMPLEMENTED FOR RESEARCH — ACCEPTED WITH DOCUMENTED LIMITATIONS
+**Date:** 14 November 2026
+**Project phase:** Phase 6 — Feature Engineering and Market Regime Detection
+
+### Context
+
+The approved four-notebook Phase 6 structure has been implemented and executed against existing local market acquisitions. The project owner approved Phase 6 closure on 14 November 2026, accepting these research conventions and the residual limitations. This entry does not approve the features, labels or regimes for forecasting, trading, or Phase 7.
+
+### Implemented research conventions
+
+1. Notebooks 10–13 use the configured market `Close` field. Returns and ratios are scale-invariant; moving-average price levels retain their configured source unit. No GBp-to-GBP conversion is applied. Price returns exclude dividends.
+2. Notebook 10 calculates simple and log returns, 5/10/20/50/100-observation momentum, SMA/EMA relationships, rolling return and realised volatility, downside volatility, drawdown, and volume changes/relative volume. The resulting 48-column set is a candidate library, not a selected model feature set.
+3. Notebook 11 aligns daily cross-asset returns by exact observation date on an outer calendar union. It does not forward-fill, interpolate, or create synthetic market observations. It does not join macroeconomic observations to decision timestamps where availability/vintage evidence is absent.
+4. Notebook 12 defines relative-volatility states using 20-observation realised volatility and lagged quantiles of the preceding 252 completed volatility observations (33rd/67th percentile baseline), and trend states using Close/SMA50/SMA200. Parameter alternatives are sensitivity scenarios, not optimised settings.
+5. Notebook 13 defines forward price returns, direction labels and unannualised forward realised volatility over 5, 10 and 20 subsequent acquired rows. Direction neutral bands of 0%, 0.5% and 1.0% are comparison scenarios; none is selected as optimal.
+6. All close-based observations at date t are available only after that session close. No same-session execution assumption is introduced. Future shifts occur only in target construction and targets remain in separate output frames.
+
+### Evidence recorded
+
+- The four notebooks executed successfully on 14 November 2026 against the existing local market acquisitions. Outputs are stored in the notebooks.
+- The complete repository test suite passed: 224 tests.
+- The full-sample descriptive Spearman screen found 51–54 feature pairs per asset with absolute correlation above 0.95 (minimum 252 paired rows). This is redundancy evidence only, not predictive feature selection.
+- Regime proportions varied materially across candidate quantiles and estimation windows. No permanent regime interpretation is adopted.
+- Directional class balance varied with the neutral band. No threshold is approved by this implementation record.
+- No Raw data were modified; no new data were acquired; no FRED/ALFRED data were used.
+
+### Review and limitations
+
+- Historical GBp denomination and corporate-action/adjustment semantics remain unvalidated; RISK-05-01 and RISK-05-02 remain open.
+- Macroeconomic availability timestamps, historical vintages and licensing remain incomplete or unvalidated. PIT_UNVALIDATED series are not eligible for strict historical use.
+- Incremental predictive value, chronological feature selection and target/regime usefulness have not been tested. Forecasting-model evaluation remains outside Phase 6.
+- The project owner accepted these research methods for Phase 6 closure; they are not promoted as forecasting or trading decisions.
+
+## D142 — Phase 6 Closure Approval
+
+**Status:** APPROVED
+**Date:** 14 November 2026
+**Project phase:** Phase 6 — Feature Engineering and Market Regime Detection
+
+### Decision
+
+The project owner explicitly approves Phase 6 closure after reviewing the executed notebooks and `reports/phase_6/PHASE_6_FINAL_IMPLEMENTATION_REPORT.md`.
+
+The approval accepts the documented research methods and limitations for Phase 6. It does not close the residual risks recorded in `docs/RISK_REGISTER.md`, validate macroeconomic PIT availability or historical price denomination, select an optimal target threshold, approve features for model training, or start Phase 7.
+
+### Consequence
+
+Phase 6 is complete and approved. Phase 7 has not started and requires a separate explicit instruction from the project owner.
+
+## Phase 7 Baseline Forecasting Implementation Record
+
+**Status:** IMPLEMENTED FOR RESEARCH — APPROVED AT PHASE CLOSURE\
+**Date:** 14 November 2026\
+**Project phase:** Phase 7 — Baseline Forecasting Models
+
+### Scope and implementation
+
+- Implemented and executed `notebooks/14_baseline_forecasting.ipynb` against the existing local acquisitions for NG.L, SSE.L, SVT.L and FTSE 100. Raw acquisitions were not modified and no data were downloaded.
+- Preserved Phase 6 targets at 5, 10 and 20 acquired rows: forward `Close` price return, zero-band direction and cumulative unannualised realised volatility. No target formula, threshold or missing-value rule was changed.
+- Compared zero, historical mean/median, trailing 252-label mean, AR(1) returns, pre-specified B/BC/BCD OLS feature groups, historical volatility and GARCH(1,1).
+- Used an 80/20 chronological development/holdout partition and expanding walk-forward development folds. Purged training origins whose target endpoint would overlap the next validation origin. No random split was used.
+- Computed ADF/KPSS, AR residual Ljung–Box and ARCH-LM diagnostics on initial training prefixes. ARCH-LM rejected no conditional heteroskedasticity at p < 0.001 for each asset; a GARCH(1,1) benchmark was therefore investigated.
+- Added `src/forecasting/` utilities, 22 tests in `tests/forecasting/`, and SciPy/Statsmodels pins to `requirements.txt`. Both packages were already present in the project environment; no package installation was run.
+
+### Research findings
+
+- A development-selected feature group reduced holdout return MAE in 4 of 12 asset/horizon cases and had higher MAE in the other 8. Holdout directional accuracy was below the best naive/AR reference in all 12 cases.
+- Group B financial features were selected in 11 cases, Group BC cross-asset features in one, and Group BCD with regimes in none. No stable incremental value was established for cross-asset or regime information.
+- Historical mean/median forecasts were strongest for volatility on NG.L, SSE.L and SVT.L. GARCH(1,1) had the lowest holdout MAE at all three horizons for FTSE 100 only.
+- Complete repository tests passed: 246 tests. The executed notebook retains its outputs. Full methods, metrics and limitations are recorded in `reports/phase_7/PHASE_7_FINAL_IMPLEMENTATION_REPORT.md`.
+
+### Status and limits
+
+This record documents the implementation evidence reviewed by the owner at Phase 7 closure. It does not close the open Phase 5/6 data risks or support a profitability, strategy or trading conclusion. Phase 8 has not started.
+
+## D143 — Phase 7 Closure Approval
+
+**Status:** APPROVED\
+**Date:** 14 November 2026\
+**Project phase:** Phase 7 — Baseline Forecasting Models
+
+### Decision
+
+The project owner approves Phase 7 closure after reviewing the implementation report, executed notebook outputs, results, tests and documented limitations.
+
+### Consequences and limits
+
+- Phase 7 is complete and approved.
+- Its negative and mixed forecasting results are accepted as research findings; no feature-based return model is promoted as useful.
+- The residual risks in `docs/RISK_REGISTER.md`, including data provenance, historical price denomination, corporate-action semantics, target overlap and model stability, remain open.
+- This approval does not authorise Phase 8. Phase 8 has not started and requires a separate instruction.
+
+## Phase 8 Machine Learning Implementation Record — Owner Review Pending
+
+**Status:** IMPLEMENTED FOR RESEARCH — NOT YET APPROVED FOR PHASE CLOSURE  
+**Date:** 14 November 2026  
+**Project phase:** Phase 8 — Machine Learning Experiments
+
+### Implementation evidence
+
+- Added `notebooks/15_machine_learning_experiments.ipynb` and reusable modules under `src/forecasting/` for ML models, data preparation, metrics, walk-forward experiments and local MLflow configuration.
+- Evaluated Ridge, Random Forest regression and Random Forest direction classification against the unchanged Phase 6 targets and Phase 7 B/BC/BCD groups for NG.L, SSE.L, SVT.L and FTSE 100.
+- Used expanding walk-forward folds with horizon-based purging. No random split was used. The previously evaluated Phase 7 holdout was not treated as an independent Phase 8 test.
+- The executed notebook and detailed results are retained in `reports/phase_8/`.
+- The full test suite passed 256 tests. No Phase 7 implementation or findings were changed.
+
+### Research findings and limits
+
+- No return model showed consistent incremental value over statistical references; direction classification did not beat the training-majority accuracy on average.
+- Ridge and Random Forest volatility forecasts had lower development walk-forward MAE than several references in many cases. These results are development evidence only and require a genuinely future evaluation period before any model promotion.
+- Block-bootstrap intervals are unadjusted for multiple comparisons. Existing data provenance, price-unit, corporate-action, licensing and serial-dependence risks remain open.
+- The potential Phase 7 AR(1) gap-handling issue was documented and reviewed but not changed.
+
+This implementation record does not constitute a Phase 8 closure decision. Owner review and explicit closure approval remain pending. Phase 9 is not authorised.

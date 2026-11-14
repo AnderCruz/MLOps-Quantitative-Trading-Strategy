@@ -2581,7 +2581,7 @@ Deliverables:
 * Target definitions and target engineering.
 * Validated feature pipeline methodology.
 
-The methodology and four-notebook structure were approved by the user on 10 November 2026. Implementation remains pending until the relevant Phase 6 chat begins.
+The methodology and four-notebook structure were approved by the user on 10 November 2026. At that date, implementation remained pending. The current execution status is recorded in Sections 29.1 and 31.
 
 ## PHASE 7 — BASELINE FORECASTING MODELS
 
@@ -3084,7 +3084,7 @@ The project must maintain a single, consistent technical direction, even though 
 
 # 29. PROJECT HISTORY, APPROVED DECISIONS AND CURRENT EXECUTION STATUS
 
-**Last status update: 10 November 2026**
+**Last status update: 14 November 2026**
 
 This section records decisions and progress confirmed in the project's phase conversations and handovers. It takes precedence over stale "starting" instructions elsewhere in this document when determining the current phase.
 
@@ -3100,12 +3100,14 @@ Where an original decision-log entry or execution record was not available in th
 | 3 | Data Quality Assessment | Completed |
 | 4 | Exploratory Data Analysis | Completed |
 | 5 | Financial Time Series and Macroeconomic Analysis | Completed and approved |
-| 6 | Feature Engineering and Market Regime Detection | Methodology and four-notebook structure approved; implementation not started |
-| 7–16 | Forecasting through Paper Trading | Not started |
+| 6 | Feature Engineering and Market Regime Detection | Completed and approved by the project owner on 14 November 2026; residual risks remain open |
+| 7 | Baseline Forecasting Models | Completed and approved under D143 on 14 November 2026 |
+| 8 | Machine Learning Experiments | Implementation and development experiments complete; awaiting owner review. No independent Phase 8 test period was available. |
+| 9–16 | Forecasting through Paper Trading | Not started; each phase requires separate explicit approval |
 
-**Next authorised work:** begin Phase 6, starting with `notebooks/10_financial_feature_engineering.ipynb`.
+**Current review gate:** project-owner review of `reports/phase_8/PHASE_8_FINAL_IMPLEMENTATION_REPORT.md`. Phase 8 closure approval and any Phase 9 work require separate explicit owner approval. A genuinely future evaluation period is required before promoting a Phase 8 model.
 
-Do not restart earlier phases. Do not begin Phase 7 until Phase 6 deliverables have been reviewed and the user has explicitly approved Phase 6 closure.
+Do not restart earlier phases or alter approved implementations without review. Phase 7 closure is recorded under D143. Phase 8 implementation is recorded in Section 34 and awaits owner review.
 
 ## 29.2 Phase 0 — approved project direction
 
@@ -3387,7 +3389,9 @@ Point-in-time eligibility remains unresolved for datasets whose publication time
 
 ## 29.9 Phase 6 — approved methodology and implementation plan
 
-**Status: methodology approved; implementation not started.**
+**Status as at 10 November 2026: methodology approved; implementation not started.**
+
+This historical status was superseded by the Phase 6 execution and approval updates dated 14 November 2026 in Sections 31 and D142 of the Decision Log. The four approved notebooks have since been implemented, executed and approved for Phase 6 closure.
 
 The user approved the Phase 6 methodology and four-notebook structure on 10 November 2026.
 
@@ -3540,6 +3544,8 @@ At the beginning of the next phase, use both this Master Project Specification a
 
 # 30. CURRENT STARTING INSTRUCTION — PHASE 6
 
+**Historical instruction — fulfilled and superseded on 14 November 2026.** The original instruction below records the state before implementation. The current state and next action are in Section 31.
+
 The current project state is:
 
 - Phase 0: completed and approved.
@@ -3575,4 +3581,70 @@ The assistant must:
 14. At the end of Phase 6, present evidence, limitations and recommendations and wait for explicit approval before Phase 7.
 
 **Do not restart Phase 0 or any completed phase. Do not treat the historical Phase 0 starting instruction in Section 27 as the current instruction.**
+
+# 31. CURRENT PHASE 6 EXECUTION UPDATE — 14 NOVEMBER 2026
+
+The approved Phase 6 notebooks have been implemented and executed against the existing local market acquisitions. Their outputs are stored in the notebooks. No Raw data were modified, no data were downloaded, and no forecasting model, strategy, backtest or Phase 7 work was started.
+
+Implemented notebooks and reusable components:
+
+- `notebooks/10_financial_feature_engineering.ipynb`
+- `notebooks/11_cross_asset_and_macroeconomic_feature_engineering.ipynb`
+- `notebooks/12_market_regime_detection.ipynb`
+- `notebooks/13_target_engineering.ipynb`
+- `src/features/financial.py`
+- `src/features/cross_asset.py`
+- `src/regimes.py`
+- `src/targets.py`
+
+The full repository test suite passed (224 tests). Phase 6 methods, numerical evidence and remaining risks are recorded in:
+
+`reports/phase_6/PHASE_6_FINAL_IMPLEMENTATION_REPORT.md`
+
+The implementation documents 48 candidate financial feature columns and substantial full-sample redundancy; exact-date cross-asset return alignment; macroeconomic exclusion from historical daily joins while release availability/vintages remain unvalidated; past-only volatility and trend regimes with materially parameter-sensitive labels; and forward return, direction and realised-volatility targets at 5, 10 and 20 observations with overlapping-label controls.
+
+The following remain open and must be reviewed or explicitly accepted by the project owner:
+
+1. Historical GBp denomination and corporate-action/adjustment semantics under D140 and RISK-05-01/RISK-05-02.
+2. Whether later targets should remain price returns based on `Close` or include dividend-adjusted returns.
+3. Macro point-in-time availability, vintages and licensing restrictions; no macro daily feature join has been made.
+4. Feature redundancy and the scope of any future chronological feature selection.
+5. Regime parameter sensitivity and directional neutral-threshold candidates.
+
+**Status at Phase 6 handover:** Phase 6 was formally closed and approved by the project owner on 14 November 2026; Phase 7 had not started at that handover. The subsequent Phase 7 implementation status is recorded in Section 32.
+
+# 32. CURRENT PHASE 7 IMPLEMENTATION UPDATE — 14 NOVEMBER 2026
+
+The project owner explicitly authorised Phase 7 implementation after Gate 1. Work was performed on branch `phase-7-baseline-forecasting`; the pre-existing Phase 6 working-tree changes were preserved. Phase 6 source modules and notebooks were not modified.
+
+Implemented and executed:
+
+- `notebooks/14_baseline_forecasting.ipynb`, with saved outputs for NG.L, SSE.L, SVT.L and FTSE 100.
+- Reusable forecasting utilities in `src/forecasting/` for chronological splits, horizon purging, naive/AR forecasts, OLS, metrics and GARCH(1,1).
+- Tests in `tests/forecasting/`.
+- The final report at `reports/phase_7/PHASE_7_FINAL_IMPLEMENTATION_REPORT.md`.
+
+The notebook retains Phase 6 targets at 5, 10 and 20 subsequent acquired rows. It uses an 80/20 chronological development/holdout split, expanding walk-forward folds and horizon-based purging; no random splitting is used. It evaluates naive and AR(1) return references, small pre-specified B/BC/BCD feature groups, historical volatility and GARCH(1,1). Macroeconomic features and FRED/ALFRED data remain excluded under existing point-in-time and authorisation restrictions.
+
+The selected feature group reduced holdout return MAE in 4 of 12 asset/horizon cases, but its directional accuracy was lower than the strongest naive/AR reference in all 12. GARCH(1,1) had the lowest holdout volatility MAE for FTSE 100 at all three horizons only. These results do not establish robust predictive value or profitability.
+
+The complete repository test suite passed: **246 tests**. SciPy 1.18.1 and Statsmodels 0.15.0 were already installed in `.venv` and are now declared in `requirements.txt`; no packages were installed. No Raw data were modified. No strategy, backtest, broker integration, Phase 8 work, commit, merge or push was performed.
+
+**Status at implementation report:** Phase 7 implementation was complete and awaiting project-owner review. The subsequent owner approval and current gate are recorded in Section 33.
+
+# 33. PHASE 7 CLOSURE APPROVAL — 14 NOVEMBER 2026
+
+The project owner approved Phase 7 closure after reviewing `reports/phase_7/PHASE_7_FINAL_IMPLEMENTATION_REPORT.md` and the executed `notebooks/14_baseline_forecasting.ipynb`.
+
+Phase 7 is complete and approved. The forecasting results remain limited to the documented research findings; no feature-based return model is promoted as useful. The risks carried in `docs/RISK_REGISTER.md` remain open. This approval does not authorise Phase 8, which has not started and requires a separate explicit instruction.
+
+# 34. PHASE 8 MACHINE LEARNING IMPLEMENTATION UPDATE — 14 NOVEMBER 2026
+
+Phase 8 traditional Machine Learning implementation and development walk-forward experiments are recorded in `reports/phase_8/PHASE_8_FINAL_IMPLEMENTATION_REPORT.md`. The executed notebook is `notebooks/15_machine_learning_experiments.ipynb`; reusable code is in `src/forecasting/ml_*.py`; detailed result tables are in `reports/phase_8/development_results/`.
+
+The experiment used Ridge regression, Random Forest regression and Random Forest direction classification for NG.L, SSE.L, SVT.L and FTSE 100. It reused the approved Phase 6 targets and Phase 7 B/BC/BCD feature groups. No macroeconomic inputs or new acquisitions were used. The Phase 7 holdout was already inspected and was not represented as an independent Phase 8 test. The report finds no consistent return or direction model value; volatility results warrant future confirmation but do not justify model promotion.
+
+The canonical local MLflow experiment is `phase_8_machine_learning_experiments_gap_aware` (ID 4) with 184 finished runs. The complete repository test suite passed 256 tests. MLflow and scikit-learn were added as pinned dependencies; PyArrow was aligned to the MLflow compatibility range. The pandas installed-version/requirements-pin mismatch remains open.
+
+**Status:** Phase 8 implementation is complete for research and awaits project-owner review. It is not formally closed or approved. Phase 9 remains unauthorised. The Phase 7 AR(1) missing-observation issue was reviewed; the Phase 7 source was not modified and the issue remains open for separate owner review.
 
