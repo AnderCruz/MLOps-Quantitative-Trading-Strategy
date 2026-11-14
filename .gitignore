@@ -22,6 +22,7 @@ htmlcov/
 
 # Raw market data
 data/raw/
+data/mlflow/
 
 # Operating system
 .DS_Store
