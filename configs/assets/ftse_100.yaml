@@ -4,6 +4,11 @@ asset:
   instrument_type: "index"
   exchange: "LSE"
   currency: "GBP"
+  accounting_currency: "GBP"
+  provider_quote_currency: "GBP"
+  price_unit: "index_points"
+  conversion_to_accounting_currency: null
+  price_unit_validation_status: "not_applicable"
   sector: null
   market_timezone: "Europe/London"
 

@@ -2,8 +2,8 @@
 ## AI Quantitative Trading & Strategy Optimisation System
 
 **Document status:** Active
-**Project phase:** Phase 2 — Multi-Asset Data Acquisition
-**Last updated:** 5 November 2026
+**Project phase:** Phase 5 — Financial Time Series and Macroeconomic Analysis (in progress)
+**Last updated:** 9 November 2026
 
 ---
 
@@ -307,3 +307,96 @@ New decisions should be added with a unique identifier, date, status, rationale,
 - Phase 2 is recorded as completed.
 - Phase 3 — Data Quality Assessment & Temporal Alignment remains not started and requires its own explicit approval.
 - No change is made to the project's long-only, research/backtesting/paper-trading-only restrictions.
+
+
+---
+
+## D140 — Market Quote Currency and Price Unit Convention
+
+**Status:** APPROVED — convention agreed; implementation and historical-data validation pending  
+**Date:** 9 November 2026  
+**Project phase:** Phase 5 — Financial Time Series and Macroeconomic Analysis
+
+### Context
+
+The original asset configurations declared `GBP` for NG.L, SSE.L, SVT.L and the FTSE 100. This configuration did not distinguish portfolio accounting currency, provider-reported quote currency and the unit in which an instrument is quoted.
+
+The Yahoo Finance chart metadata endpoint was queried directly on 9 November 2026 for all four symbols. All four requests returned HTTP 200.
+
+### Verified provider metadata
+
+| Instrument | Symbol | `currency` | `instrumentType` | `exchangeName` | `fullExchangeName` |
+|---|---|---|---|---|---|
+| National Grid | `NG.L` | `GBp` | `EQUITY` | `LSE` | `LSE` |
+| SSE plc | `SSE.L` | `GBp` | `EQUITY` | `LSE` | `LSE` |
+| Severn Trent | `SVT.L` | `GBp` | `EQUITY` | `LSE` | `LSE` |
+| FTSE 100 | `^FTSE` | `GBP` | `INDEX` | `FGI` | `FTSE Index` |
+
+The returned `regularMarketPrice` values were metadata observations at query time and are not adopted as historical prices or backtest inputs.
+
+### Decision
+
+1. `GBP` is the portfolio accounting currency.
+2. Yahoo Finance reports `GBp` as the quote currency for NG.L, SSE.L and SVT.L. Their quoted price unit is therefore pence sterling.
+3. The conversion factor from pence sterling to pounds sterling is `0.01 GBP per GBp`.
+4. Price values used in GBP-denominated portfolio accounting and valuation must be converted consistently from GBp to GBP in a downstream processing layer.
+5. The original Raw acquisitions must remain immutable. No in-place conversion or modification of Raw files is permitted.
+6. The FTSE 100 is an index. Its observations are expressed in index points (`index_points`), not in GBP or GBp price units. No currency conversion is to be applied to index levels.
+7. Asset metadata and configuration must distinguish:
+   - `accounting_currency`;
+   - `provider_quote_currency`;
+   - `price_unit`;
+   - `conversion_to_accounting_currency`, where applicable.
+8. Volume and stock-split fields must not be subjected to currency conversion.
+9. Dividend action values must not be converted until their unit convention has been independently verified. The chart metadata `currency` field alone is not sufficient evidence of the units used in the dividend action records.
+10. The approved convention does not authorise immediate changes to asset YAML files, manifests, Raw data or Notebook 09. Those implementation changes require a controlled follow-up step.
+
+### Proposed asset metadata convention
+
+For the three LSE equities:
+
+| Field | Approved value |
+|---|---|
+| `accounting_currency` | `GBP` |
+| `provider_quote_currency` | `GBp` |
+| `price_unit` | `pence` |
+| `conversion_to_accounting_currency` | `0.01` |
+
+For the FTSE 100:
+
+| Field | Approved value |
+|---|---|
+| `instrument_type` | `index` |
+| `provider_quote_currency` | `GBP` (provider metadata) |
+| `price_unit` | `index_points` |
+| `conversion_to_accounting_currency` | `null` |
+
+The `provider_quote_currency` value reported for the index must not be interpreted as meaning that index levels are monetary prices.
+
+### Evidence and provenance
+
+- Provider: Yahoo Finance.
+- Endpoint: `https://query1.finance.yahoo.com/v8/finance/chart/{symbol}`.
+- Query date: 9 November 2026.
+- Symbols queried: `NG.L`, `SSE.L`, `SVT.L` and `^FTSE`.
+- HTTP response: 200 for all four symbols.
+- Fields inspected: `symbol`, `currency`, `instrumentType`, `exchangeName`, `fullExchangeName`, `priceHint` and `regularMarketPrice`.
+- The terminal output from the query is retained in the project conversation as implementation evidence.
+
+### Validation still required
+
+- Verify the denomination of historical price columns in the existing Raw acquisitions against the provider-reported convention before applying any transformation.
+- Independently establish the unit convention for dividend action values.
+- Implement and test downstream conversion without changing Raw acquisitions.
+- Verify that portfolio accounting, position sizing, cash, fees and P&L use GBP consistently.
+- Preserve index levels as index points.
+- Update asset configurations and relevant manifests only through a separately controlled implementation step.
+
+### Consequences
+
+- The previous single `currency: GBP` configuration is insufficient to describe all four instruments.
+- The asset configuration schema requires a controlled revision.
+- Processed equity prices used for GBP accounting will use GBP after validated conversion.
+- The FTSE 100 remains in index points.
+- This decision approves the unit convention; it does not constitute formal approval of the historical datasets for modelling or formal data-quality closure.
+- Raw acquisitions remain unchanged and immutable.

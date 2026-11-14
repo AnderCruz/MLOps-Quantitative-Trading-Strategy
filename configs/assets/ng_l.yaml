@@ -4,6 +4,11 @@ asset:
   instrument_type: "equity"
   exchange: "LSE"
   currency: "GBP"
+  accounting_currency: "GBP"
+  provider_quote_currency: "GBp"
+  price_unit: "GBp"
+  conversion_to_accounting_currency: 0.01
+  price_unit_validation_status: "pending"
   sector: "Utilities"
   market_timezone: "Europe/London"
 

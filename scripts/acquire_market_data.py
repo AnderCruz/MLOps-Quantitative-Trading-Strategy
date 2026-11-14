@@ -20,6 +20,14 @@ import yfinance as yf
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    model_validator,
+)
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -54,9 +62,67 @@ class AssetConfiguration(BaseModel):
     name: str = Field(min_length=1)
     instrument_type: Literal["equity", "index"]
     exchange: str = Field(min_length=1)
+
+    # Legacy field retained for backward compatibility.
     currency: str = Field(min_length=1)
+
+    # Financial denomination metadata.
+    accounting_currency: str = Field(min_length=1)
+    provider_quote_currency: str = Field(min_length=1)
+    price_unit: str = Field(min_length=1)
+    conversion_to_accounting_currency: float | None = Field(
+        default=None,
+        gt=0,
+    )
+    price_unit_validation_status: Literal[
+        "pending",
+        "validated",
+        "not_applicable",
+    ]
+
     sector: str | None = None
     market_timezone: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_price_unit_configuration(self):
+        """Validate instrument-specific price-unit metadata."""
+
+        if self.instrument_type == "equity":
+            if self.price_unit == "index_points":
+                raise ValueError(
+                    "Equity instruments cannot use index_points."
+                )
+
+            if self.conversion_to_accounting_currency is None:
+                raise ValueError(
+                    "Equity instruments require a conversion factor."
+                )
+
+            if self.price_unit_validation_status == "not_applicable":
+                raise ValueError(
+                    "Equity price-unit validation cannot be "
+                    "not_applicable."
+                )
+
+        if self.instrument_type == "index":
+            if self.price_unit != "index_points":
+                raise ValueError(
+                    "Index instruments must use index_points."
+                )
+
+            if self.conversion_to_accounting_currency is not None:
+                raise ValueError(
+                    "Index instruments cannot have a currency "
+                    "conversion factor."
+                )
+
+            if self.price_unit_validation_status != "not_applicable":
+                raise ValueError(
+                    "Index price-unit validation must be "
+                    "not_applicable."
+                )
+
+        return self
 
 
 class ProviderConfiguration(BaseModel):
@@ -289,6 +355,15 @@ def build_manifest(
         "exchange": asset.exchange,
         "currency": asset.currency,
         "currency_status": "configured_assumption",
+        "accounting_currency": asset.accounting_currency,
+        "provider_quote_currency": asset.provider_quote_currency,
+        "price_unit": asset.price_unit,
+        "conversion_to_accounting_currency": (
+            asset.conversion_to_accounting_currency
+        ),
+        "price_unit_validation_status": (
+            asset.price_unit_validation_status
+        ),
         "sector": asset.sector,
         "market_timezone": asset.market_timezone,
         "configuration": {

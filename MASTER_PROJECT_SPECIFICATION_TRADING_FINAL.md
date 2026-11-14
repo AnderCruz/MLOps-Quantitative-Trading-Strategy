@@ -1,5 +1,9 @@
 # MASTER PROJECT SPECIFICATION
 
+**Revision:** 2.0 — Project history and approved decisions incorporated  
+**Last updated:** 10 November 2026  
+**Document status:** Authoritative project specification; current execution status is recorded in Section 29.
+
 # AI QUANTITATIVE TRADING & STRATEGY OPTIMISATION SYSTEM
 
 **Project Name:** AI Quantitative Trading & Strategy Optimisation System
@@ -1434,21 +1438,19 @@ Investigate stationarity, autocorrelation, volatility and financial time series 
 
 Develop and evaluate technical, statistical and volatility features.
 
-**11_cross_asset_feature_engineering.ipynb**
+**11_cross_asset_and_macroeconomic_feature_engineering.ipynb**
 
-Develop features from equity indices, comparable companies, commodities, bonds and FX.
+Develop and evaluate cross-asset and macroeconomic features, including publication-aware transformations and point-in-time constraints.
 
-**12_macroeconomic_feature_engineering.ipynb**
-
-Develop macroeconomic features, yield curve variables and publication-aware transformations.
-
-**13_market_regime_detection.ipynb**
+**12_market_regime_detection.ipynb**
 
 Investigate market regimes using statistical and Machine Learning methodologies.
 
-**14_target_engineering.ipynb**
+**13_target_engineering.ipynb**
 
 Define and compare prediction targets and forecast horizons.
+
+This four-notebook Phase 6 structure was explicitly approved on 10 November 2026. It supersedes the earlier five-notebook proposal that separated cross-asset and macroeconomic feature engineering.
 
 ### FORECASTING MODELS
 
@@ -1642,11 +1644,10 @@ AI-Quantitative-Trading-Strategy-Optimisation/
 │   ├── 08_macroeconomic_analysis.ipynb
 │   ├── 09_financial_time_series_analysis.ipynb
 │   ├── 10_financial_feature_engineering.ipynb
-│   ├── 11_cross_asset_feature_engineering.ipynb
-│   ├── 12_macroeconomic_feature_engineering.ipynb
-│   ├── 13_market_regime_detection.ipynb
-│   ├── 14_target_engineering.ipynb
-│   ├── 15_baseline_forecasting.ipynb
+│   ├── 11_cross_asset_and_macroeconomic_feature_engineering.ipynb
+│   ├── 12_market_regime_detection.ipynb
+│   ├── 13_target_engineering.ipynb
+│   ├── 14_baseline_forecasting.ipynb
 │   ├── 16_machine_learning_experiments.ipynb
 │   ├── 17_deep_learning_experiments.ipynb
 │   ├── 18_advanced_forecasting.ipynb
@@ -2564,13 +2565,23 @@ Objectives:
 * Investigate feature selection.
 * Establish target definitions.
 
+Approved notebook sequence:
+
+* `notebooks/10_financial_feature_engineering.ipynb`
+* `notebooks/11_cross_asset_and_macroeconomic_feature_engineering.ipynb`
+* `notebooks/12_market_regime_detection.ipynb`
+* `notebooks/13_target_engineering.ipynb`
+
 Deliverables:
 
-* Feature engineering notebooks.
-* Market regime detection notebook.
-* Feature definitions.
-* Target engineering notebook.
+* Financial feature engineering.
+* Cross-asset and macroeconomic feature engineering.
+* Market regime detection and regime indicators.
+* Feature definitions and point-in-time rules.
+* Target definitions and target engineering.
 * Validated feature pipeline methodology.
+
+The methodology and four-notebook structure were approved by the user on 10 November 2026. Implementation remains pending until the relevant Phase 6 chat begins.
 
 ## PHASE 7 — BASELINE FORECASTING MODELS
 
@@ -2964,17 +2975,19 @@ Use the specification as the single source of truth for project scope, methodolo
 
 ---
 
-# 27. STARTING INSTRUCTION — PHASE 0
+# 27. ORIGINAL PROJECT INITIALISATION INSTRUCTION — HISTORICAL
 
-We are starting a new project.
+This section records the original project-start instruction and is retained for audit history. It is not the current execution instruction.
 
-Your first responsibility is to execute:
+Phase 0 was subsequently completed and approved, followed by Phases 1–5. The current phase and next action are recorded in Section 29.
+
+The original instruction was:
 
 **PHASE 0 — PROJECT DEFINITION & TECHNICAL PLANNING**
 
-Do not begin data acquisition, create forecasting models, implement trading strategies or write production code.
+At project initiation, the assistant was required not to begin data acquisition, forecasting models, trading strategies or production code before completing the Phase 0 plan and obtaining explicit approval.
 
-First, analyse this specification and produce a comprehensive Phase 0 technical plan.
+The original Phase 0 plan was required to analyse this specification and produce a comprehensive technical plan.
 
 The Phase 0 plan must include:
 
@@ -3023,9 +3036,7 @@ Explain your recommendations in Brazilian Portuguese.
 
 All technical artefacts and project documentation must remain in British English.
 
-At the end of Phase 0, present the final technical plan and wait for my explicit approval.
-
-**Do not start Phase 1 until I explicitly approve Phase 0.**
+At the end of the original Phase 0, the final technical plan was to be presented for explicit approval before Phase 1. This approval gate has been satisfied; Phase 0 is closed. See Section 29 for current status.
 
 ---
 
@@ -3068,3 +3079,500 @@ Rules:
 * If a new chat identifies a necessary change to an earlier decision, discuss it with me before implementation.
 
 The project must maintain a single, consistent technical direction, even though development is distributed across multiple conversations.
+
+---
+
+# 29. PROJECT HISTORY, APPROVED DECISIONS AND CURRENT EXECUTION STATUS
+
+**Last status update: 10 November 2026**
+
+This section records decisions and progress confirmed in the project's phase conversations and handovers. It takes precedence over stale "starting" instructions elsewhere in this document when determining the current phase.
+
+Where an original decision-log entry or execution record was not available in the retained project history, this section does not invent it. Retrospective documentation must be distinguished from contemporaneous execution evidence.
+
+## 29.1 Current phase status
+
+| Phase | Description | Current status |
+|---|---|---|
+| 0 | Project Definition and Technical Planning | Completed and approved |
+| 1 | Financial and Macroeconomic Data Sources Investigation | Completed and approved |
+| 2 | Data Architecture and Acquisition | Completed and approved |
+| 3 | Data Quality Assessment | Completed |
+| 4 | Exploratory Data Analysis | Completed |
+| 5 | Financial Time Series and Macroeconomic Analysis | Completed and approved |
+| 6 | Feature Engineering and Market Regime Detection | Methodology and four-notebook structure approved; implementation not started |
+| 7–16 | Forecasting through Paper Trading | Not started |
+
+**Next authorised work:** begin Phase 6, starting with `notebooks/10_financial_feature_engineering.ipynb`.
+
+Do not restart earlier phases. Do not begin Phase 7 until Phase 6 deliverables have been reviewed and the user has explicitly approved Phase 6 closure.
+
+## 29.2 Phase 0 — approved project direction
+
+Phase 0 was approved. The initial configuration remains:
+
+- London Stock Exchange.
+- National Grid (`NG.L`) as the pilot asset.
+- Multi-asset architecture, with the pilot asset configurable rather than hard-coded.
+- Daily-frequency, long-only swing-trading research.
+- GBP base currency and hypothetical initial capital of £1,000.
+- Research, historical backtesting and paper trading only.
+- No live capital, live broker integration, leverage, derivatives or short selling without separate explicit approval.
+- British English project artefacts and Brazilian Portuguese explanations.
+- One dedicated conversation per project phase, with explicit approval gates.
+
+The initial research universe discussed in Phase 0 included NG.L, SSE, SVT, FTSE 100, S&P 500, VIX, GBP/USD, EUR/GBP, UK gilt yields, Bank Rate/SONIA, inflation, GDP, labour-market and business-activity indicators, energy prices, credit indicators, company fundamentals and regulation. This was an investigation universe, not a commitment to use every variable as a feature.
+
+## 29.3 Phase 1 — data sources investigation
+
+Phase 1 was completed and approved.
+
+The following source decisions are recorded:
+
+| Data category | Investigated / selected source | Qualification |
+|---|---|---|
+| Exploratory equity market data | Yahoo Finance | Conditionally accepted for exploratory research; no redistribution or commercial-use rights are assumed |
+| UK monetary policy and rates | Bank of England | Source for Bank Rate, SONIA and nominal 2Y/10Y gilt-yield series used in the project |
+| UK inflation and national accounts | Office for National Statistics (ONS) | Selected series were acquired and their definitions/semantics investigated |
+| FRED / ALFRED | Federal Reserve Bank of St. Louis services | **Blocked for model training unless written authorisation expressly resolves the relevant restrictions** |
+
+Selected ONS series recorded in the project history:
+
+| Indicator | ONS series identifier |
+|---|---|
+| CPI | `D7G7` |
+| Core CPI | `DKO8` |
+| CPIH | `L55O` |
+| Real GDP | `ABMI` |
+| GDP growth | `IHYQ` |
+
+The project also investigated or considered sources including the Debt Management Office, Ofgem, Elexon, Alpha Vantage, Twelve Data and Financial Modeling Prep. Their appearance in the original investigation scope does not mean that they were all approved, acquired or licensed for commercial use.
+
+Yahoo Finance data must remain clearly labelled as exploratory unless and until the relevant provider terms and intended use have been reviewed. No commercial redistribution rights should be inferred.
+
+### FRED / ALFRED restriction
+
+The user explicitly approved the following restriction:
+
+**FRED/ALFRED data must not be used to train project models without written authorisation that expressly resolves the applicable restrictions.**
+
+This is a binding project decision. Reconsideration is deferred until the project's potential commercialisation requirements are assessed and suitable written authorisation is obtained. Do not bypass this restriction by using downloaded, cached or transformed copies of restricted data.
+
+## 29.4 Phase 2 — data architecture and acquisition
+
+Phase 2 was completed and its closure was explicitly approved.
+
+The approved acquisition architecture included:
+
+- Provider-independent data adapters.
+- YAML configuration with Pydantic validation.
+- Full, fixed-range and incremental acquisition modes.
+- Dataset watermarks for incremental acquisition.
+- Immutable raw data.
+- Acquisition identifiers and manifests.
+- SHA-256 integrity checks.
+- Atomic commits of acquired datasets.
+- Retries, rate limits and circuit-breaker controls.
+- Structured JSON logs, audit records and data lineage.
+- Local monitoring at this stage.
+- Separate raw, interim and processed data layers.
+- Explicit time-zone and temporal-alignment controls.
+- No indiscriminate forward-filling.
+- Controls to prevent information becoming available before its actual publication time.
+- Next-session execution assumptions for later strategy simulation.
+
+The architecture was approved as a design. Do not assume every proposed operational control was fully implemented unless supported by repository evidence.
+
+The project history records an explicit Phase 2 closure decision (`D139`) and an ONS MM23/QNA semantic-validation decision (`D138`). Decision entries `D130–D137` were not reconstructed in the available handover history; do not invent their contents.
+
+The user recorded ONS acquisition metadata for an inflation dataset:
+- Acquisition ID: `20261105T132954Z_b4ce351c`
+- File size: 23,228,735 bytes
+- SHA-256: `ed5b20...` (the complete digest must be taken from the original acquisition record; this abbreviated value is not sufficient for integrity verification).
+
+The Phase 2 documentation included a Bank Rate SHA-256 record. For exact hashes, manifests, acquisition IDs and dataset counts, consult the repository's actual manifests and Phase 2 documentation rather than reconstructing them from this summary.
+
+## 29.5 Retrospective documentation and evidence provenance
+
+The user recorded that commit `a088146` added retrospective documentary notebooks 01–05, the Master Specification, a Phase 3 report and README.
+
+Important provenance qualification:
+
+- Notebooks 01–05 are Markdown-only retrospective documentary records.
+- Illustrative code in those retrospective notebooks was not executed.
+- They are not original execution records.
+- Raw data were not changed by that documentation work.
+- Historical evidence, retrospective reconstruction and unavailable evidence must remain clearly distinguished.
+
+Never describe illustrative code in these retrospective records as executed code. Use actual notebook outputs, source datasets, manifests, Git history and reports when validating an empirical result.
+
+## 29.6 Phase 3 — data quality assessment
+
+Phase 3 was completed.
+
+The phase concerned data-quality assessment and validation of the acquired datasets. Its documentation and report are part of the project record.
+
+Do not infer that a data source is fully point-in-time compliant merely because its data passed structural or quality checks. Publication timestamps, historical vintages, licensing and availability-at-decision-time remain separate controls.
+
+## 29.7 Phase 4 — exploratory analysis
+
+Phase 4 was completed.
+
+The approved notebook workstreams were:
+
+- `notebooks/06_exploratory_data_analysis.ipynb`
+- `notebooks/07_multi_asset_analysis.ipynb`
+- `notebooks/08_macroeconomic_analysis.ipynb`
+
+The approved research universe included:
+
+- NG.L as the pilot.
+- SSE.L and SVT.L as comparable UK utilities.
+- FTSE 100 as the UK equity-market benchmark.
+- Interest rates and government bond yields.
+- Inflation and GDP.
+- Cross-asset and macroeconomic relationships.
+
+Phase 4 was exploratory. Correlation, descriptive statistics or visual patterns do not establish causality or predictive value and do not, by themselves, approve a variable for model training.
+
+Phase 5 was reserved for deeper financial time-series analysis, including stationarity, autocorrelation, econometric properties and volatility.
+
+## 29.8 Phase 5 — financial time-series and macroeconomic analysis
+
+Phase 5 was completed and explicitly approved on 10 November 2026.
+
+Primary notebook:
+
+`notebooks/09_financial_time_series_analysis.ipynb`
+
+Notebook 08 contains the broader macroeconomic analysis. Notebook 09 integrates relevant interest-rate and yield-curve context without unnecessarily repeating all of Notebook 08.
+
+Completed sections in Notebook 09:
+
+- Section 6 — Data Loading.
+- Section 7 — Data Inspection.
+- Section 8 — Data Preparation.
+- Section 9 — Financial Returns Analysis.
+- Section 10 — Distribution Analysis.
+- Section 11 — Stationarity Analysis.
+- Section 12 — Autocorrelation Analysis.
+- Section 13 — Volatility Analysis.
+- Section 14 — Interest Rates and Yield Curve.
+- Section 15 — Macroeconomic Context and Research Implications.
+- Section 16 — Final Findings, Limitations and Conclusions.
+
+The user confirmed that all remaining cells in Sections 14–16 executed successfully. Phase 5 was then closed and approved.
+
+### 29.8.1 Stationarity methodology and findings
+
+Methods:
+- Augmented Dickey-Fuller (ADF).
+- KPSS.
+- Significance level: 0.05.
+- ADF `autolag="AIC"`.
+- KPSS `nlags="auto"`.
+- Price levels: regression `ct`.
+- Returns: regression `c`.
+- Missing observations were dropped for each test; no imputation was performed.
+
+Findings:
+- NG.L price-level tests produced conflicting evidence.
+- Returns generally provided evidence consistent with stationarity.
+- SSE.L, SVT.L and FTSE price levels showed evidence consistent with non-stationarity, while returns supported stationarity.
+- Rolling analysis used a 504-observation window and a 21-observation step. The windows overlap substantially and are exploratory.
+
+These tests do not establish that future returns are predictable.
+
+### 29.8.2 Autocorrelation methodology and findings
+
+The analysis covered ACF, PACF, individual significance tests, Ljung-Box tests, squared-return autocorrelation, rolling autocorrelation and cross-asset comparison.
+
+Key findings:
+- All 32 reported Ljung-Box tests on raw returns rejected the null hypothesis at the 5% level.
+- All 32 squared-return Ljung-Box tests were significant.
+- The squared-return results remained significant after Bonferroni and Holm corrections.
+- Squared-return autocorrelation was particularly pronounced for NG.L, SSE.L and FTSE.
+- Rolling squared-return autocorrelation varied materially over time.
+
+Interpretation:
+- The evidence is consistent with volatility clustering and serial dependence in the examined series.
+- It does not prove a profitable trading signal, conditional-mean predictability or the superiority of a particular volatility model.
+- Individual ACF/PACF confidence intervals were not corrected for multiple comparisons.
+- Rolling windows were heavily overlapping and dependent.
+- `dropna()` can compress missing dates; a window of 504 valid observations does not necessarily represent 504 consecutive market sessions.
+
+P-values displayed as zero due to numerical precision must be reported as `<0.001`, not as literal zero.
+
+### 29.8.3 Volatility and ARCH findings
+
+The volatility analysis used a 21-session rolling window and an annualisation factor of 252 as conventions, not optimised parameters. ARCH tests used 10 lags.
+
+User-provided results:
+
+| Asset | Observations | ARCH-LM statistic | F statistic |
+|---|---:|---:|---:|
+| NG.L | 7,888 | 1,561.3715 | 194.4599 |
+| SSE.L | 9,058 | 1,067.8343 | 120.9250 |
+| SVT.L | 9,453 | 109.9844 | 11.1151 |
+| FTSE | 10,684 | 1,992.1074 | 244.6683 |
+
+All reported ARCH-LM and F-test p-values were displayed as zero and must be interpreted as `<0.001`.
+
+The tests reject the null of no ARCH effects in the tested series. However, ARCH-LM testing is ideally performed on residuals from a correctly specified conditional-mean model. The raw-return results must be interpreted cautiously because raw-return autocorrelation was also detected.
+
+These findings do not automatically establish that a GARCH model is appropriate or that volatility can be exploited profitably.
+
+### 29.8.4 Interest rates and yield curve
+
+The analysis included Bank Rate, SONIA, nominal UK 2-year and 10-year gilt yields, and the 10Y–2Y spread.
+
+Recorded dataset information:
+
+| Series | Valid observations | Date range |
+|---|---:|---|
+| Bank Rate | 13,104 | 1975-01-02 to 2026-11-02 |
+| SONIA | 7,496 | 1997-03-03 to 2026-10-30 |
+| Gilt Yield 2Y | 12,090 | 1979-01-01 to 2026-10-30 |
+| Gilt Yield 10Y | 12,090 | 1979-01-01 to 2026-10-30 |
+
+Each Gilt series had 12,480 index observations and 390 missing observations before paired analysis.
+
+Notebook 08's recorded yield-curve findings:
+- Paired observations: 12,090.
+- Positive 10Y–2Y spread: 8,664 observations (71.66%).
+- Negative spread: 3,426 observations (28.34%).
+- 90 inversion episodes.
+- Longest identified inversion episode: July 1988 to October 1990, 819 calendar days.
+- Minimum spread during that episode: approximately -2.16 percentage points.
+- Prolonged inversion episodes were also observed during 2023–2024.
+
+Do not reuse unverified descriptive statistics from earlier assistant-generated text. Use the actual notebook output if exact mean, median, standard deviation or extrema are required.
+
+SONIA methodology changed on 23 April 2018. This must be considered when interpreting the historical series.
+
+### 29.8.5 Macroeconomic context
+
+Notebook 08 analysed CPI, Core CPI, CPIH and GDP-related indicators.
+
+Recorded historical descriptive findings:
+- CPIH historical mean: 2.91%.
+- CPI historical mean: 2.84%.
+- Core CPI historical mean: 2.51%.
+- CPI standard deviation: 2.12 percentage points.
+- Core CPI standard deviation: 1.76 percentage points.
+- Maximum CPI: 11.1%.
+- Maximum CPIH: 9.6%.
+- Maximum Core CPI: 8.2%.
+- Quarterly real GDP growth minimum: -19.9% in 2020 Q2.
+- Quarterly real GDP growth maximum: 16.9% in 2020 Q3.
+
+CPIH includes owner-occupiers' housing costs. Core CPI excludes selected volatile components. CPIH–CPI and CPI–Core spreads are algebraically related and must not be treated as independent information without justification.
+
+GDP levels, quarterly/annual growth and GDP deflator growth were examined separately. The GDP deflator complements rather than replaces CPI/CPIH.
+
+### 29.8.6 Phase 5 interpretation and limitations
+
+The Phase 5 evidence supports further investigation of:
+- Financial return distributions and serial dependence.
+- Volatility clustering and conditional heteroskedasticity.
+- Interest-rate and yield-curve context.
+- Inflation and economic-growth context.
+
+It does not approve any external variable as a forecasting feature. That decision belongs to later feature research and validation.
+
+Point-in-time eligibility remains unresolved for datasets whose publication timestamps, historical release vintages or availability dates have not been validated. In particular:
+- Gilt and GDP datasets were classified as `PIT_UNVALIDATED` in the prior analysis.
+- Monthly inflation and quarterly GDP require publication delays, release timestamps and vintage controls.
+- Observation dates must not be confused with publication or availability dates.
+
+## 29.9 Phase 6 — approved methodology and implementation plan
+
+**Status: methodology approved; implementation not started.**
+
+The user approved the Phase 6 methodology and four-notebook structure on 10 November 2026.
+
+Phase 6 objectives:
+1. Develop financial features.
+2. Develop cross-asset features.
+3. Develop macroeconomic features.
+4. Investigate market regimes.
+5. Develop regime indicators.
+6. Investigate feature selection.
+7. Establish target definitions.
+
+Approved notebook structure:
+
+| Notebook | Title | Main scope |
+|---|---|---|
+| 10 | `10_financial_feature_engineering.ipynb` | Financial features derived from prices, returns, volume and volatility |
+| 11 | `11_cross_asset_and_macroeconomic_feature_engineering.ipynb` | Cross-asset and macroeconomic features, temporal alignment and point-in-time controls |
+| 12 | `12_market_regime_detection.ipynb` | Market regime definitions, estimation and evaluation |
+| 13 | `13_target_engineering.ipynb` | Forward-return, directional and volatility targets |
+
+This structure supersedes the earlier proposal of five separate notebooks for financial, cross-asset, macroeconomic, regime and target work. Do not silently revert to the older structure.
+
+### 29.9.1 Notebook 10 — Financial Feature Engineering
+
+Start here.
+
+Candidate feature families, to be evaluated rather than blindly implemented:
+- Simple and log returns.
+- Lagged and cumulative returns.
+- Momentum over candidate lookbacks.
+- Simple and exponential moving averages.
+- Price-to-moving-average relationships.
+- Rolling volatility and realised volatility.
+- Downside volatility.
+- Rolling drawdown.
+- Volume changes and relative volume.
+- High–low range and true range.
+
+Each feature requires a definition, rationale, lookback, timestamp convention, missing-data policy and leakage assessment. Avoid excessive or redundant indicators.
+
+### 29.9.2 Notebook 11 — Cross-Asset and Macroeconomic Feature Engineering
+
+Investigate only economically justified variables from the approved data universe, including:
+- FTSE and relevant market/sector returns.
+- Comparable utilities.
+- GBP exchange rates.
+- Bank Rate, SONIA and gilt yields/spread.
+- Inflation and GDP-related indicators.
+- Energy and other external market variables where data and hypotheses justify them.
+
+Test whether each group adds information beyond the target asset's own history. Preserve source, timestamp, frequency, unit, licence and point-in-time availability metadata.
+
+Do not assume observation date equals publication date. Do not use macroeconomic information before its release. FRED/ALFRED restrictions remain binding.
+
+### 29.9.3 Notebook 12 — Market Regime Detection
+
+Investigate interpretable, causal-in-time regime indicators before adopting more complex methods.
+
+Candidate approaches may include:
+- Trend-based states.
+- Volatility-based states.
+- Threshold-based classification.
+- Clustering.
+- Gaussian Mixture Models.
+- Hidden Markov Models, only if justified.
+
+No fixed number of regimes or specific algorithm has been approved in advance. Evaluate stability, transition behaviour, interpretability and out-of-sample consistency. A regime at time t must use only information available at time t.
+
+### 29.9.4 Notebook 13 — Target Engineering
+
+Investigate:
+- Forward returns.
+- Directional targets.
+- Forward realised volatility.
+
+Initial candidate horizons approved for investigation:
+- 5 trading sessions.
+- 10 trading sessions.
+- 20 trading sessions.
+
+These are research candidates, not proven optimal horizons. Define labels carefully, document overlapping-label implications, neutral thresholds and class balance, and prevent leakage. Do not train forecasting models during Phase 6.
+
+### 29.9.5 Phase 6 completion gate
+
+Before Phase 6 closure, review:
+- Feature definitions and rationale.
+- Reproducible calculations.
+- Correct temporal alignment.
+- Missing-data policies.
+- Leakage controls.
+- Cross-asset alignment.
+- Point-in-time eligibility and unresolved limitations.
+- Regime definitions and indicators.
+- Target definitions and horizons.
+- Redundancy and feature-selection evidence.
+- Technical limitations and final conclusions.
+
+Then present evidence and risks and wait for explicit user approval before Phase 7.
+
+## 29.10 Decision and risk governance
+
+The following decisions remain binding:
+
+| Decision | Requirement |
+|---|---|
+| Multi-asset architecture | Preserve; NG.L is a pilot, not a hard-coded constraint |
+| Exploratory Yahoo Finance use | Conditional; no assumed redistribution or commercial rights |
+| FRED/ALFRED training | Prohibited without written authorisation expressly resolving restrictions |
+| Point-in-time integrity | Mandatory; observation date is not automatically availability date |
+| Feature inclusion | Requires justification and incremental-value evidence |
+| Forecasting vs trading | Separate components and separate evaluation |
+| Risk controls | Independent of model confidence; must be researched and approved |
+| Backtesting | Realistic costs, execution timing, cash, accounting and corporate actions |
+| Paper trading | Mandatory before any live-trading discussion |
+| Live trading | Not authorised |
+| Scope expansion | Requires explicit approval |
+
+Key risks to carry into Phase 6:
+- Feature leakage and look-ahead bias.
+- Excessive or redundant feature generation.
+- Cross-asset calendar and timestamp misalignment.
+- Macroeconomic release delays and revisions.
+- Unvalidated point-in-time data.
+- Regime overfitting and instability.
+- Overlapping forward labels.
+- Data snooping and multiple testing.
+- Data licensing and commercial-use restrictions.
+
+## 29.11 Mandatory handover protocol
+
+The project uses one dedicated conversation per phase.
+
+At the end of every phase, prepare a handover in British English that records:
+- Completed activities.
+- Technical decisions and approvals.
+- Architecture changes.
+- Files created or modified.
+- Experiments, outputs and tests.
+- Data provenance and licensing.
+- Results and interpretation.
+- Unresolved issues.
+- Risks and limitations.
+- Exact phase status.
+- The next authorised steps.
+
+At the beginning of the next phase, use both this Master Project Specification and the previous phase handover. Do not rely on memory alone for exact file paths, hashes, outputs or implementation details; inspect the repository and original records when needed.
+
+---
+
+# 30. CURRENT STARTING INSTRUCTION — PHASE 6
+
+The current project state is:
+
+- Phase 0: completed and approved.
+- Phase 1: completed and approved.
+- Phase 2: completed and approved.
+- Phase 3: completed.
+- Phase 4: completed.
+- Phase 5: completed and approved.
+- Phase 6: methodology and four-notebook structure approved; implementation pending.
+
+The next conversation must begin:
+
+**PHASE 6 — FEATURE ENGINEERING AND MARKET REGIME DETECTION**
+
+Start with:
+
+`notebooks/10_financial_feature_engineering.ipynb`
+
+The assistant must:
+1. Acknowledge the current status and preserve prior decisions.
+2. Use this Master Project Specification and the Phase 5 handover.
+3. Confirm the scope and objective of Notebook 10.
+4. Inspect the actual project repository/notebook structure before assuming variables, data objects or files exist.
+5. Propose the notebook outline.
+6. Work incrementally, one logical section or small group of cells at a time.
+7. Explain each step in Brazilian Portuguese.
+8. Write all notebook content and code in British English.
+9. Ask the user to execute the code and wait for the output.
+10. Validate outputs before proceeding.
+11. Do not begin Notebooks 11–13 prematurely.
+12. Do not train forecasting models, develop trading strategies or implement backtesting during Phase 6.
+13. Maintain decision and risk logs.
+14. At the end of Phase 6, present evidence, limitations and recommendations and wait for explicit approval before Phase 7.
+
+**Do not restart Phase 0 or any completed phase. Do not treat the historical Phase 0 starting instruction in Section 27 as the current instruction.**
+
