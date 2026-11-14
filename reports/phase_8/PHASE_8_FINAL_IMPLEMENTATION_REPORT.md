@@ -147,7 +147,7 @@ In the NG.L Group B, 10-row return sensitivity check, Ridge MAE was 0.029739 for
 
 ## 7. MLflow and reproducibility
 
-The canonical experiment is **`phase_8_machine_learning_experiments_gap_aware`**, experiment ID **4** in the local tracking database. It contains **184 FINISHED runs**: 180 primary model configurations and four parameter-sensitivity configurations. Representative NG.L Group B, horizon 10 models retain model artifacts; all runs record fold predictions and metrics.
+At the original implementation report date, the canonical experiment **`phase_8_machine_learning_experiments_gap_aware`**, experiment ID **4**, contained **184 FINISHED runs**: 180 primary model configurations and four parameter-sensitivity configurations. The technical remediation subsequently reran the notebook once, bringing the local experiment to 368 finished records. The original and remediation runs remain in the local database for audit. Representative NG.L Group B, horizon 10 models retain model artifacts; all runs record fold predictions and metrics.
 
 Tracking uses the local SQLite database at `data/mlflow/mlflow.db` and artifacts under `data/mlflow/artifacts/`. The directory is excluded from Git. No remote tracking service is used. The 180 primary runs record model family, asset, horizon, target, feature group, dataset identifier, available-data and validation dates, feature-column hash, parameters, seed, software versions, validation predictions and metrics. The four sensitivity runs record their pilot asset, horizon, target, feature group, parameters, seed, predictions and metrics. Models saved from a development fold are research artifacts, not deployable selected models.
 
@@ -161,7 +161,7 @@ The principal reproducible files are:
 - `reports/phase_8/development_results/feature_importance.csv` — fold-level Random Forest importance.
 - `reports/phase_8/development_results/predictions.csv` — fold-level predictions (approximately 50 MB).
 
-The local `.venv` versions at execution were Python 3.12.3, pandas 3.1.1, NumPy 2.5.4, SciPy 1.18.1, Statsmodels 0.15.0, scikit-learn 1.9.1, MLflow 3.16.1, PyArrow 25.0.1, pytest 9.2.0 and JupyterLab 4.6.5. `requirements.txt` pins pandas 3.1.0 while the existing environment has 3.1.1; this pre-existing environment/pin mismatch remains visible and was not resolved by an automatic upgrade.
+The original local execution used Python 3.12.3, pandas 3.1.1, NumPy 2.5.4, SciPy 1.18.1, Statsmodels 0.15.0, scikit-learn 1.9.1, MLflow 3.16.1, PyArrow 25.0.1, pytest 9.2.0 and JupyterLab 4.6.5. The remediation aligned the direct pandas pin with 3.1.1, declared NumPy 2.5.4, and added an exact Python 3.12 dependency lock. A fresh environment installed the lock successfully, passed `pip check`, and passed the full test suite. The notebook run used JupyterLab 4.6.5 and nbclient 0.11.0.
 
 MLflow 3.16.1 requires PyArrow below 26, so the project pin was changed from 26.0.0 to 25.0.1 to make the declared environment coherent. This compatible local version passed the complete test suite. scikit-learn 1.9.1 and MLflow 3.16.1 were added as direct pins. MLflow emits one SQLAlchemy deprecation warning during its tracking test; no test failed.
 
@@ -169,9 +169,9 @@ Earlier implementation attempts are retained in separate local MLflow experiment
 
 ## 8. Tests and quality assurance
 
-The complete repository test suite passed: **256 passed, 1 warning**. This includes the existing tests and ten new Phase 8 forecasting tests for Ridge validation, walk-forward chronology, Random Forest regression/classification, common-date masks, metrics, block-bootstrap reproducibility and local MLflow configuration.
+The original implementation test suite passed **256 tests with one warning**. After remediation coverage was expanded, the complete suite passed **273 tests with one warning** in a newly created environment from the exact lock.
 
-The Phase 8 notebook executed successfully with no cell errors. `pip check` reported no broken installed requirements. No new market data were downloaded, no Raw files were modified and no approved Phase 7 code or results were changed.
+The Phase 8 notebook was executed from beginning to end on the existing local acquisitions with 13 code cells and no cell errors. Following a metadata-only update to the sensitivity logging cell, that cell was re-executed in isolation with its local data-preparation cells and a temporary SQLite tracking store; it also completed without errors. `pip check` reported no broken installed requirements. No new market data were downloaded, no Raw files were modified and no approved Phase 6 or Phase 7 code or results were changed.
 
 ## 9. Open risks and limitations
 
@@ -183,9 +183,9 @@ The Phase 8 notebook executed successfully with no cell errors. `pip check` repo
 - Feature redundancy and regime sensitivity remain open; impurity importance is not causal or a selection rule.
 - Macro point-in-time availability, historical vintages and licensing remain unresolved. FRED/ALFRED restrictions remain in force.
 - The Phase 7 AR(1) missing-observation handling issue remains open for owner review; the Phase 7 source was not modified.
-- The current pandas environment version differs from the declared requirements pin.
+- The hosted GitHub Actions workflow has not run because no commit or push was authorised. Its YAML and local equivalent dependency/test steps were validated; an actual hosted workflow result remains outstanding.
 
-No risk is closed by this report.
+The environment reproducibility risk is mitigated by the lock and clean-install evidence. The remaining research, data, licensing and independent-evaluation risks remain open.
 
 ## 10. Research conclusion and recommendation
 
@@ -194,3 +194,7 @@ The current evidence does not justify promoting ML return or direction models. R
 Before any model promotion, freeze the evaluation protocol and obtain a genuinely future evaluation period. Review the AR(1) gap issue separately before changing Phase 7. No Phase 9 work is authorised by this report; it requires separate explicit owner approval.
 
 **Phase 8 implementation status:** complete for research and awaiting project-owner review. **Phase 8 closure approval:** not recorded here.
+
+## Technical remediation addendum — 14 November 2026
+
+The subsequent technical remediation and final validation evidence are recorded in `PHASE_8_TECHNICAL_REMEDIATION_REPORT.md`. The original results and limitations above remain historical implementation evidence. The current predictions artefact has complete acquired positions and 368 local MLflow runs carry reconciled traceability metadata. Current development results remain non-independent and unapproved; this addendum does not alter research conclusions or constitute Phase 8 closure approval.

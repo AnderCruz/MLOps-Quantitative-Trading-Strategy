@@ -30,6 +30,8 @@ def direction_metrics(predictions: pd.DataFrame) -> dict[str, object]:
     actual = predictions["actual"].astype(int).to_numpy()
     forecast = predictions["forecast"].astype(int).to_numpy()
     probability = predictions["probability_positive"].astype(float).to_numpy()
+    if not np.isfinite(probability).all() or ((probability < 0) | (probability > 1)).any():
+        raise ValueError("Positive-class probabilities must be finite and within [0, 1].")
     if not np.isin(actual, DIRECTION_CLASSES).all() or not np.isin(forecast, DIRECTION_CLASSES).all():
         raise ValueError("Direction labels must remain in the approved classes -1, 0 and +1.")
     binary_actual = (actual == 1).astype(int)
@@ -81,9 +83,21 @@ def block_bootstrap_mae_difference(
         raise ValueError("replications must be an integer of at least 100.")
     if not predictions.index.is_unique:
         raise ValueError("Prediction dates must be unique for paired comparison.")
-    aligned = predictions.join(benchmark_forecast.rename("benchmark"), how="inner").dropna(
-        subset=["actual", "forecast", "benchmark"]
-    )
+    if not benchmark_forecast.index.is_unique:
+        raise ValueError("Benchmark dates must be unique for paired comparison.")
+    if "fold" in predictions and predictions["fold"].isna().any():
+        raise ValueError("Fold identifiers must be complete for block resampling.")
+    if "acquired_position" in predictions:
+        source_positions = pd.to_numeric(predictions["acquired_position"], errors="coerce").to_numpy(dtype=float)
+        if not np.isfinite(source_positions).all() or (source_positions < 0).any() or not np.equal(
+            source_positions, np.floor(source_positions)
+        ).all():
+            raise ValueError("Acquired positions must be complete non-negative integers.")
+    aligned = predictions.join(benchmark_forecast.rename("benchmark"), how="inner")
+    finite = np.ones(len(aligned), dtype=bool)
+    for column in ("actual", "forecast", "benchmark"):
+        finite &= np.isfinite(pd.to_numeric(aligned[column], errors="coerce").to_numpy(dtype=float))
+    aligned = aligned.loc[finite]
     if aligned.empty:
         raise ValueError("No paired forecast dates are available.")
     model_error = np.abs(aligned["forecast"].to_numpy() - aligned["actual"].to_numpy())

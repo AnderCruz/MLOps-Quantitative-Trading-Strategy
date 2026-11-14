@@ -1,0 +1,77 @@
+name: Phase 8 CI
+
+on:
+  push:
+    branches:
+      - Main
+      - develop
+      - 'phase-*'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - Main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase-8-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python 3.12 tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install declared dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Check dependency consistency
+        run: python -m pip check
+
+      - name: Run complete test suite
+        run: python -m pytest -q --junitxml=pytest-results.xml
+
+      - name: Publish test summary
+        if: always()
+        env:
+          TEST_RESULT_FILE: pytest-results.xml
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          report = Path(os.environ["TEST_RESULT_FILE"])
+          if not report.exists():
+              summary = f"## Phase 8 test summary\n\nJob status: **{os.environ['JOB_STATUS']}**. No JUnit report was produced.\n"
+          else:
+              root = ET.parse(report).getroot()
+              suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
+              total = sum(int(suite.get("tests", 0)) for suite in suites)
+              failures = sum(int(suite.get("failures", 0)) for suite in suites)
+              errors = sum(int(suite.get("errors", 0)) for suite in suites)
+              skipped = sum(int(suite.get("skipped", 0)) for suite in suites)
+              passed = total - failures - errors - skipped
+              summary = (
+                  "## Phase 8 test summary\n\n"
+                  f"- Job status: **{os.environ['JOB_STATUS']}**\n"
+                  f"- Passed: **{passed}**\n- Failed: **{failures}**\n"
+                  f"- Errors: **{errors}**\n- Skipped: **{skipped}**\n"
+              )
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
+              stream.write(summary)
+          PY

@@ -313,8 +313,8 @@ New decisions should be added with a unique identifier, date, status, rationale,
 
 ## D140 — Market Quote Currency and Price Unit Convention
 
-**Status:** APPROVED — convention agreed; implementation and historical-data validation pending  
-**Date:** 9 November 2026  
+**Status:** APPROVED — convention agreed; implementation and historical-data validation pending
+**Date:** 9 November 2026
 **Project phase:** Phase 5 — Financial Time Series and Macroeconomic Analysis
 
 ### Context
@@ -497,8 +497,8 @@ The project owner approves Phase 7 closure after reviewing the implementation re
 
 ## Phase 8 Machine Learning Implementation Record — Owner Review Pending
 
-**Status:** IMPLEMENTED FOR RESEARCH — NOT YET APPROVED FOR PHASE CLOSURE  
-**Date:** 14 November 2026  
+**Status:** IMPLEMENTED FOR RESEARCH — NOT YET APPROVED FOR PHASE CLOSURE
+**Date:** 14 November 2026
 **Project phase:** Phase 8 — Machine Learning Experiments
 
 ### Implementation evidence
@@ -517,3 +517,26 @@ The project owner approves Phase 7 closure after reviewing the implementation re
 - The potential Phase 7 AR(1) gap-handling issue was documented and reviewed but not changed.
 
 This implementation record does not constitute a Phase 8 closure decision. Owner review and explicit closure approval remain pending. Phase 9 is not authorised.
+
+## D144 — Phase 8 Technical Remediation Record
+
+**Status:** IMPLEMENTED FOR TECHNICAL REVIEW — NOT AN OWNER APPROVAL
+**Date:** 14 November 2026
+**Project phase:** Phase 8 — Machine Learning Experiments
+
+### Decision and evidence
+
+This record documents technical changes made under the authorised Phase 8 remediation task; it does not record an owner decision or approve phase closure.
+
+- Added Python 3.12 GitHub Actions CI with least-privilege read-only repository permissions, dependency caching, dependency checks, complete pytest execution and a test summary.
+- Resolved the pandas mismatch to 3.1.1, explicitly pinned NumPy 2.5.4, introduced an exact development dependency lock from a clean Python 3.12 installation, and verified `pip check` and the full test suite in that environment.
+- Reconstructed the existing predictions CSV from local acquired timelines, assigned exact acquired-row positions to all 501,060 outputs, and validated keys, dates, folds, common actuals, feature-group dates and classifier probabilities.
+- Added tests for gap-aware purging, future-data invariance, training-only fitting, fresh estimators per fold, single-class classifier training, paired finite metrics, prediction identity and MLflow persistence across a process restart.
+- Strengthened local MLflow run metadata for source revision and dirty state, package/Python versions, feature value hash, dataset ID/date range, model configuration and per-fold training/validation periods.
+- Recorded direction class imbalance, an AR(1) benchmark caveat, multiple-comparison limits, and unresolved data/licensing governance risks. No Phase 6/7 source or approved result was changed.
+
+The evidence and remaining limitations are recorded in `reports/phase_8/PHASE_8_TECHNICAL_REMEDIATION_REPORT.md`. A hosted GitHub Actions run and owner review remain pending. No independent evaluation period is available; all Phase 8 results remain development evidence.
+
+### Consequences
+
+The technical changes are reviewable on the current branch. Existing development findings and the zero-neutral-band target remain unchanged. The Phase 7 AR(1) issue requires a separately approved decision before altering approved Phase 7 code or results. Phase 8 closure is pending explicit project-owner approval, and Phase 9 remains unauthorised.

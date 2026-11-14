@@ -57,3 +57,21 @@ def test_future_rows_do_not_change_existing_walk_forward_splits():
     for (train_a, validation_a), (train_b, validation_b) in zip(original, extended):
         np.testing.assert_array_equal(train_a, train_b)
         np.testing.assert_array_equal(validation_a, validation_b)
+
+
+@pytest.mark.parametrize("horizon", [1, 5, 10, 20])
+def test_purging_respects_acquired_positions_and_boundary_for_each_horizon(horizon):
+    evaluation = np.array([100, 101, 102])
+    training = np.array([0, 50, 100 - horizon - 1, 100 - horizon, 100 - horizon + 1])
+    kept = purge_overlapping_origins(training, evaluation, horizon=horizon)
+    assert np.all(kept + horizon <= evaluation[0])
+    assert (100 - horizon) in kept
+    assert (100 - horizon + 1) not in kept
+
+
+def test_missing_acquired_positions_are_not_compressed_for_horizon_purging():
+    # Positions 96–98 may be missing labels, but remain part of the acquired time axis.
+    observed_training = np.array([90, 94, 95, 99])
+    evaluation = np.array([100, 102])
+    kept = purge_overlapping_origins(observed_training, evaluation, horizon=5)
+    np.testing.assert_array_equal(kept, [90, 94, 95])

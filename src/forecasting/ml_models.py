@@ -124,11 +124,10 @@ def ridge_walk_forward_predictions(
     timeline before incomplete feature/target rows are excluded. This avoids
     compressing missing acquired rows and accidentally changing the horizon.
     """
-    model = build_regression_model("ridge", parameters={"alpha": alpha})
     return regression_walk_forward_predictions(
         x,
         y,
-        model_factory=lambda: model,
+        model_factory=lambda: build_regression_model("ridge", parameters={"alpha": alpha}),
         horizon=horizon,
         initial_train_size=initial_train_size,
         validation_size=validation_size,
@@ -205,6 +204,9 @@ def direction_walk_forward_predictions(
         step_size=step_size,
         embargo=embargo,
     )
+    observed_labels = y[valid_targets].to_numpy(dtype=float)
+    if not np.isin(observed_labels, (-1.0, 0.0, 1.0)).all():
+        raise ValueError("Direction targets must use only the existing -1, 0 and +1 labels.")
     records: list[dict[str, object]] = []
     for fold_number, (train_positions, validation_positions) in enumerate(splits, start=1):
         train_positions = train_positions[valid_features[train_positions] & valid_targets[train_positions]]
@@ -222,13 +224,21 @@ def direction_walk_forward_predictions(
         predictions = model.predict(x.iloc[validation_positions]).astype(int)
         probabilities = model.predict_proba(x.iloc[validation_positions])
         class_to_column = {int(label): i for i, label in enumerate(model.classes_)}
+        if not set(class_to_column).issubset({-1, 0, 1}):
+            raise ValueError("The fitted classifier returned unsupported direction classes.")
         for offset, position in enumerate(validation_positions):
+            mapped_probabilities = np.array([
+                probabilities[offset, class_to_column[label]] if label in class_to_column else 0.0
+                for label in (-1, 0, 1)
+            ])
+            if not np.isfinite(mapped_probabilities).all() or not np.isclose(mapped_probabilities.sum(), 1.0):
+                raise ValueError("Mapped direction probabilities must be finite and sum to one.")
             records.append({
                 "date": x.index[position], "fold": fold_number,
                 "actual": int(y.iloc[position]), "forecast": int(predictions[offset]),
-                "probability_negative": float(probabilities[offset, class_to_column[-1]]) if -1 in class_to_column else 0.0,
-                "probability_neutral": float(probabilities[offset, class_to_column[0]]) if 0 in class_to_column else 0.0,
-                "probability_positive": float(probabilities[offset, class_to_column[1]]) if 1 in class_to_column else 0.0,
+                "probability_negative": float(mapped_probabilities[0]),
+                "probability_neutral": float(mapped_probabilities[1]),
+                "probability_positive": float(mapped_probabilities[2]),
             })
     if not records:
         raise ValueError("Walk-forward evaluation produced no complete validation predictions.")

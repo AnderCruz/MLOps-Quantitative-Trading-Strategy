@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import subprocess
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
@@ -28,6 +29,7 @@ from src.forecasting.ml_models import (
 )
 from src.forecasting.metrics import regression_metrics
 from src.forecasting.mlflow_tracking import configure_local_experiment
+from src.forecasting.prediction_artifacts import attach_acquired_positions, validate_prediction_artifact
 from src.forecasting.validation import expanding_window_splits
 
 
@@ -166,12 +168,26 @@ def _direction_baselines(
 def _software_versions() -> dict[str, str]:
     names = ("pandas", "numpy", "scipy", "statsmodels", "scikit-learn", "mlflow", "pyarrow")
     versions = {}
+    versions["python"] = __import__("platform").python_version()
     for name in names:
         try:
             versions[name] = version(name)
         except PackageNotFoundError:
             versions[name] = "not installed"
     return versions
+
+
+def _repository_state(root: Path) -> tuple[str, bool]:
+    """Return the checked-out revision and whether the source tree has changes."""
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, check=True,
+        capture_output=True, text=True,
+    ).stdout.strip()
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=root, check=True,
+        capture_output=True, text=True,
+    ).stdout
+    return revision, bool(status.strip())
 
 
 def run_phase8_experiments(
@@ -186,6 +202,7 @@ def run_phase8_experiments(
     experiment_id = configure_local_experiment(root)
     dataset_ids = inventory.set_index("symbol")["dataset_id"].to_dict()
     software = _software_versions()
+    git_commit, git_worktree_dirty = _repository_state(root)
     metric_rows: list[dict[str, object]] = []
     fold_rows: list[dict[str, object]] = []
     comparison_rows: list[dict[str, object]] = []
@@ -259,6 +276,7 @@ def run_phase8_experiments(
                                 parameters=RF_PARAMETERS, random_state=SEED,
                                 on_fit=capture_fit,
                             )
+                            predictions["acquired_position"] = frame.index.get_indexer(predictions.index)
                             model_metrics = direction_metrics(predictions)
                             for row in fold_direction_metrics(predictions).to_dict(orient="records"):
                                 fold_rows.append({
@@ -287,6 +305,14 @@ def run_phase8_experiments(
                                 })
 
                         run_name = f"{symbol}_h{horizon}_{target_kind}_{feature_group}_{model_family}"
+                        train_periods = {row["fold"]: row for row in training_ranges}
+                        fold_periods = []
+                        for fold, fold_predictions in predictions.groupby("fold", sort=True):
+                            fold_periods.append({
+                                **train_periods.get(int(fold), {"fold": int(fold)}),
+                                "validation_start": str(fold_predictions.index.min().date()),
+                                "validation_end": str(fold_predictions.index.max().date()),
+                            })
                         with mlflow.start_run(experiment_id=experiment_id, run_name=run_name):
                             mlflow.set_tags({
                                 "phase": "8", "evaluation_role": "development_walk_forward",
@@ -309,9 +335,14 @@ def run_phase8_experiments(
                                 "feature_columns_sha256": hashlib.sha256(
                                     json.dumps(list(x.columns)).encode("utf-8")
                                 ).hexdigest(),
+                                "feature_values_sha256": hashlib.sha256(
+                                    pd.util.hash_pandas_object(x, index=True).to_numpy().tobytes()
+                                ).hexdigest(),
+                                "git_commit": git_commit,
                             }
                             mlflow.log_params(params_to_log)
-                            mlflow.log_dict(training_ranges, "fold_training_ranges.json")
+                            mlflow.set_tag("git_worktree_dirty", str(git_worktree_dirty).lower())
+                            mlflow.log_dict(fold_periods, "fold_periods.json")
                             for package_name, package_version in software.items():
                                 mlflow.set_tag(f"software.{package_name}", package_version)
                             for name, value in model_metrics.items():
@@ -388,12 +419,22 @@ def run_phase8_experiments(
                                     **uncertainty,
                                 })
 
+    all_predictions = pd.concat(prediction_frames).rename_axis("date").reset_index() if prediction_frames else pd.DataFrame()
+    if not all_predictions.empty:
+        all_predictions = attach_acquired_positions(all_predictions, market_data)
+        all_predictions = all_predictions.sort_values(
+            ["asset", "fold", "acquired_position", "horizon", "target", "feature_group", "model"],
+            kind="stable",
+        ).reset_index(drop=True)
+        validate_prediction_artifact(all_predictions, market_data)
+        all_predictions = all_predictions.set_index("date")
+
     results = {
         "metrics": pd.DataFrame(metric_rows),
         "fold_metrics": pd.DataFrame(fold_rows),
         "comparisons": pd.DataFrame(comparison_rows),
         "feature_importance": pd.DataFrame(importance_rows),
-        "predictions": pd.concat(prediction_frames).sort_index() if prediction_frames else pd.DataFrame(),
+        "predictions": all_predictions,
     }
     return results
 

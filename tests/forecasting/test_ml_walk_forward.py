@@ -74,3 +74,37 @@ def test_random_forest_regression_and_direction_keep_fold_dates_and_classes():
         classification[["probability_negative", "probability_neutral", "probability_positive"]].sum(axis=1),
         1.0,
     )
+
+
+def test_one_class_training_fold_maps_missing_class_probabilities_to_zero():
+    index = pd.date_range("2024-01-01", periods=50, freq="B")
+    x = pd.DataFrame({"feature": np.arange(50, dtype=float)}, index=index)
+    labels = np.array([-1] * 25 + [0, 1] * 12 + [-1])
+    y = pd.Series(labels, index=index)
+    fitted = []
+    predictions = direction_walk_forward_predictions(
+        x, y, horizon=5, initial_train_size=20, validation_size=10,
+        parameters={"n_estimators": 8, "min_samples_leaf": 2},
+        on_fit=lambda fold, model, train_x, train_y: fitted.append((fold, model, train_y.copy())),
+    )
+    first_fold = predictions.loc[predictions.fold == 1]
+    assert fitted[0][0] == 1
+    assert set(fitted[0][2].unique()) == {-1}
+    assert (first_fold.probability_negative == 1.0).all()
+    assert (first_fold.probability_neutral == 0.0).all()
+    assert (first_fold.probability_positive == 0.0).all()
+
+
+def test_each_walk_forward_fold_fits_a_fresh_ridge_estimator():
+    index = pd.date_range("2024-01-01", periods=50, freq="B")
+    x = pd.DataFrame({"feature": np.arange(50, dtype=float)}, index=index)
+    y = pd.Series(np.arange(50, dtype=float) / 100.0, index=index)
+    fitted = []
+    predictions = regression_walk_forward_predictions(
+        x, y,
+        model_factory=lambda: build_regression_model("ridge", parameters={"alpha": 1.0}),
+        horizon=3, initial_train_size=20, validation_size=5,
+        on_fit=lambda fold, model, train_x, train_y: fitted.append(model),
+    )
+    assert len(predictions)
+    assert len({id(model) for model in fitted}) == len(fitted)

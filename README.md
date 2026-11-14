@@ -60,6 +60,11 @@ Important notes:
 - `reports/phase_6/PHASE_6_FINAL_IMPLEMENTATION_REPORT.md`
 - `reports/phase_7/PHASE_7_FINAL_IMPLEMENTATION_REPORT.md`
 - `reports/phase_8/PHASE_8_FINAL_IMPLEMENTATION_REPORT.md`
+- `reports/phase_8/PHASE_8_TECHNICAL_REMEDIATION_REPORT.md`
+- `reports/phase_8/PHASE_8_REMEDIATION_BASELINE.md`
+- `reports/phase_8/DIRECTION_CLASS_DISTRIBUTION_NOTE.md`
+- `reports/phase_8/BENCHMARK_AND_INFERENCE_AUDIT.md`
+- `docs/PHASE_8_CI.md`
 - `notebooks/15_machine_learning_experiments.ipynb`
 
 ## Phase 6 — Feature Engineering and Market Regime Detection
@@ -105,3 +110,20 @@ test, and no model is promoted.
 
 Phases 0–7 are complete and approved. Phase 8 implementation is complete for
 research and awaits owner review. Phase 9 is not authorised.
+
+Phase 8 CI is defined in `.github/workflows/phase-8-ci.yml`. It uses Python
+3.12, the exact dependency lock, `pip check` and the complete pytest suite.
+Set up the same local test environment from the repository root with:
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pip check
+.venv/bin/python -m pytest -q
+```
+
+Direct runtime dependencies are declared in `requirements.txt`; the tested
+Python 3.12 environment is recorded in `requirements-lock.txt`. Remediation
+evidence and any hosted CI execution limitation are documented in the Phase 8
+technical remediation report. Formal Phase 8 closure remains pending explicit
+project-owner approval.
